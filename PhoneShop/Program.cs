@@ -1,0 +1,41 @@
+using Microsoft.EntityFrameworkCore;
+using PhoneShop.DB;
+using System.Net;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add db to the container.
+builder.Services.AddDbContext<PhoneShopDbContext>(
+    o => o.UseSqlServer(builder.Configuration
+    .GetConnectionString("PhoneShopConnection")));
+
+builder.Services.AddControllersWithViews();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapStaticAssets();
+
+app.MapControllerRoute(
+          name: "areas",
+          pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+        );
+
+app.MapControllerRoute( 
+    name: "default", 
+    pattern: "{controller=Home}/{action=Index}/{id?}")
+.WithStaticAssets();
+
+app.Run();
